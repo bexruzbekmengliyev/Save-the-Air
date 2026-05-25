@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AirGuard | Save the Air, Save the Future</title>
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --shadow: 0 8px 30px rgba(0,0,0,0.08);
+      --shadow-hover: 0 12px 40px rgba(0,0,0,0.12);
+      --radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0b1120;
+      --bg-secondary: #111827;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #34d399;
+      --accent-hover: #10b981;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --shadow: 0 8px 30px rgba(0,0,0,0.3);
+      --shadow-hover: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: var(--transition);
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(var(--bg-secondary), 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      transition: var(--transition);
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .theme-toggle {
+      background: none;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-toggle:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+    /* Hero */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 6rem 5% 4rem;
+      background: linear-gradient(135deg, #dcfce7 0%, #e0f2fe 50%, #f0fdf4 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    [data-theme="dark"] #hero {
+      background: linear-gradient(135deg, #022c22 0%, #0f172a 50%, #064e3b 100%);
+    }
+    #hero h1 {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, var(--accent), var(--info));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    #hero p { font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin-bottom: 2rem; }
+    .btn {
+      padding: 1rem 2rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6); background: var(--accent-hover); }
+
+    /* Sections */
+    section { padding: 5rem 5%; }
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: var(--accent);
+      margin: 0.5rem auto 0;
+      border-radius: 2px;
+    }
+
+    /* Grid & Cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+    .card i { font-size: 2rem; color: var(--accent); margin-bottom: 1rem; }
+    .card h3 { margin-bottom: 0.5rem; }
+    .card p { color: var(--text-secondary); font-size: 0.95rem; }
+
+    /* AQI Section */
+    #aqi { background: var(--bg-secondary); }
+    .aqi-display {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      border: 2px solid var(--border);
+    }
+    .aqi-value {
+      font-size: 4rem;
+      font-weight: 800;
+      margin: 0.5rem 0;
+      transition: color 0.3s;
+    }
+    .aqi-status { font-size: 1.2rem; font-weight: 600; }
+    .aqi-bar {
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow: hidden;
+    }
+    .aqi-progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);
+      transition: width 1s ease, background 0.5s ease;
+    }
+
+    /* Gases */
+    .gas-card { text-align: center; }
+    .gas-icon { width: 80px; height: 80px; background: var(--bg-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.8rem; }
+
+    #stats, #tips, #renewable, #tree-recycle { background: var(--bg-primary); }
+    #stats canvas { max-width: 800px; margin: 0 auto; background: var(--card-bg); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+
+    /* Tips */
+    .tip-item { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+    .tip-item i { color: var(--accent); font-size: 1.2rem; margin-top: 4px; }
+
+    /* Renewable & Tree/Recycle */
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem; }
+    .feature-card { background: var(--card-bg); padding: 2rem; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); border-top: 4px solid var(--accent); }
+
+    /* Footer */
+    footer {
+      background: var(--bg-secondary);
+      padding: 3rem 5%;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    /* Animations */
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .float-anim { animation: float 4s ease-in-out infinite; }
+    .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.6s ease-out; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      section { padding: 4rem 5%; }
+      #hero h1 { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><i class="fas fa-leaf"></i> AirGuard</div>
+    <nav class="nav-links">
+      <a href="#causes">Causes</a>
+      <a href="#aqi">Air Quality</a>
+      <a href="#stats">Data</a>
+      <a href="#tips">Tips</a>
+      <a href="#renewable">Energy</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><i class="fas fa-moon"></i></button>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section id="hero">
+      <h1 class="float-anim">Save the Air,<br>Save the Future</h1>
+      <p>Every breath matters. Learn, act, and join the global movement for cleaner air and a sustainable planet.</p>
+      <button class="btn" onclick="document.getElementById('causes').scrollIntoView()">Start Learning <i class="fas fa-arrow-down"></i></button>
+    </section>
+
+    <!-- Causes -->
+    <section id="causes">
+      <h2 class="section-title fade-in">Main Causes of Air Pollution</h2>
+      <div class="grid">
+        <div class="card fade-in"><i class="fas fa-car-side"></i><h3>Vehicle Emissions</h3><p>Cars, trucks, and buses release NOx, CO, and particulate matter daily.</p></div>
+        <div class="card fade-in"><i class="fas fa-industry"></i><h3>Factory Smoke</h3><p>Industrial plants emit sulfur dioxide, heavy metals, and toxic chemicals.</p></div>
+        <div class="card fade-in"><i class="fas fa-fire"></i><h3>Plastic Burning</h3><p>Open burning releases dioxins and microplastics into the atmosphere.</p></div>
+        <div class="card fade-in"><i class="fas fa-tree"></i><h3>Deforestation</h3><p>Fewer trees mean less CO2 absorption and disrupted oxygen cycles.</p></div>
+        <div class="card fade-in"><i class="fas fa-hard-hat"></i><h3>Construction Dust</h3><p>PM2.5 and PM10 from sites severely impact respiratory health.</p></div>
+        <div class="card fade-in"><i class="fas fa-fire-flame-simple"></i><h3>Fossil Fuels</h3><p>Coal, oil, and gas power plants are the largest source of global CO2.</p></div>
+      </div>
+    </section>
+
+    <!-- Real-time AQI -->
+    <section id="aqi">
+      <h2 class="section-title fade-in">Real-Time Air Quality</h2>
+      <div class="aqi-display fade-in">
+        <div class="aqi-status" id="aqiStatus">Loading...</div>
+        <div class="aqi-value" id="aqiValue">--</div>
+        <div class="aqi-bar"><div class="aqi-progress" id="aqiProgress"></div></div>
+        <p style="color: var(--text-secondary);">Mock live simulation • Updates every 3 seconds</p>
+      </div>
+    </section>
+
+    <!-- Harmful Gases -->
+    <section id="gases">
+      <h2 class="section-title fade-in">Know the Harmful Gases</h2>
+      <div class="grid">
+        <div class="card gas-card fade-in">
+          <div class="gas-icon"><i class="fas fa-smog"></i></div>
+          <h3>CO₂ (Carbon Dioxide)</h3>
+          <p>Primary greenhouse gas. Traps heat, causing global warming and ocean acidification.</p>
+        </div>
+        <div class="card gas-card fade-in">
+          <div class="gas-icon"><i class="fas fa-wind"></i></div>
+          <h3>CH₄ (Methane)</h3>
+          <p>80x more potent than CO₂ over 20 years. Released from livestock, landfills, and drilling.</p>
+        </div>
+        <div class="card gas-card fade-in">
+          <div class="gas-icon"><i class="fas fa-cloud"></i></div>
+          <h3>Smoke & PM2.5</h3>
+          <p>Tiny particles penetrate lungs and bloodstream, causing asthma, heart disease, and cancer.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats & Chart -->
+    <section id="stats">
+      <h2 class="section-title fade-in">Pollution Trends & Data</h2>
+      <canvas id="pollutionChart" class="fade-in"></canvas>
+    </section>
+
+    <!-- Tips -->
+    <section id="tips">
+      <h2 class="section-title fade-in">How to Reduce Air Pollution</h2>
+      <div class="grid">
+        <div class="card fade-in">
+          <h3><i class="fas fa-bus"></i> Commute Smart</h3>
+          <p>Use public transport, bike, or walk. Carpool when possible to cut emissions.</p>
+        </div>
+        <div class="card fade-in">
+          <h3><i class="fas fa-plug"></i> Save Energy</h3>
+          <p>Switch to LED bulbs, unplug devices, and use smart thermostats at home.</p>
+        </div>
+        <div class="card fade-in">
+          <h3><i class="fas fa-seedling"></i> Plant & Protect</h3>
+          <p>Trees absorb 22kg of CO₂ yearly. Support urban greening projects.</p>
+        </div>
+        <div class="card fade-in">
+          <h3><i class="fas fa-recycle"></i> Reduce Waste</h3>
+          <p>Recycle, compost, and avoid single-use plastics to lower landfill methane.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Renewable Energy -->
+    <section id="renewable">
+      <h2 class="section-title fade-in">Clean Energy Solutions</h2>
+      <div class="feature-grid">
+        <div class="feature-card fade-in">
+          <i class="fas fa-sun" style="font-size: 3rem; color: #f59e0b; margin-bottom: 1rem;"></i>
+          <h3>Solar Power</h3>
+          <p>Harness sunlight for electricity. Zero emissions during operation. Costs dropped 90% in a decade.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <i class="fas fa-wind" style="font-size: 3rem; color: #3b82f6; margin-bottom: 1rem;"></i>
+          <h3>Wind Energy</h3>
+          <p>Turbines convert kinetic wind energy into clean power. Ideal for coastal and open plains.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tree Planting & Recycling -->
+    <section id="tree-recycle">
+      <h2 class="section-title fade-in">Act Locally, Impact Globally</h2>
+      <div class="grid">
+        <div class="card fade-in" style="border-left: 4px solid #10b981;">
+          <h3><i class="fas fa-tree"></i> Tree Planting Campaign</h3>
+          <p>Join community drives. One mature tree produces enough oxygen for 2 people daily. We've planted <strong>12,400+</strong> trees this year.</p>
+          <button class="btn" style="margin-top: 1rem; padding: 0.6rem 1.2rem; font-size: 0.9rem;">Volunteer Now</button>
+        </div>
+        <div class="card fade-in" style="border-left: 4px solid #3b82f6;">
+          <h3><i class="fas fa-recycle"></i> Smart Recycling</h3>
+          <p>Sort waste at source. Glass, paper, metal, and plastic can be reused endlessly. Reduces landfill methane by up to 60%.</p>
+          <div style="margin-top: 1rem; background: var(--bg-primary); padding: 0.8rem; border-radius: 8px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:var(--text-secondary);">
+              <span>Recycling Rate</span><span>78%</span>
+            </div>
+            <div class="aqi-bar" style="margin: 0.5rem 0;"><div class="aqi-progress" style="width: 78%; background: #3b82f6;"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 AirGuard Platform. Built for a cleaner tomorrow. 🌍💨</p>
+    <p style="margin-top: 0.5rem; font-size: 0.85rem;">Educational purposes • Data simulated for demo</p>
+  </footer>
+
+  <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const icon = themeToggle.querySelector('i');
+
+    function setTheme(dark) {
+      html.setAttribute('data-theme', dark ? 'dark' : 'light');
+      icon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+
+    // Load saved theme
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') setTheme(true);
+    else if (saved === 'light') setTheme(false);
+    else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme(true);
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      setTheme(!isDark);
+      updateChartTheme();
+    });
+
+    // Mock Real-time AQI
+    const aqiValue = document.getElementById('aqiValue');
+    const aqiStatus = document.getElementById('aqiStatus');
+    const aqiProgress = document.getElementById('aqiProgress');
+
+    function updateAQI() {
+      // Simulate realistic AQI fluctuation
+      const base = 85;
+      const random = Math.floor(Math.random() * 60) - 20;
+      const aqi = Math.max(10, Math.min(300, base + random));
+      aqiValue.textContent = aqi;
+      aqiProgress.style.width = `${Math.min(100, (aqi / 300) * 100)}%`;
+
+      let status, color;
+      if (aqi <= 50) { status = 'Good 🟢'; color = '#10b981'; }
+      else if (aqi <= 100) { status = 'Moderate 🟡'; color = '#f59e0b'; }
+      else if (aqi <= 150) { status = 'Unhealthy for Sensitive 🟠'; color = '#f97316'; }
+      else { status = 'Hazardous 🔴'; color = '#ef4444'; }
+
+      aqiStatus.textContent = status;
+      aqiValue.style.color = color;
+    }
+    updateAQI();
+    setInterval(updateAQI, 3000);
+
+    // Chart.js
+    const ctx = document.getElementById('pollutionChart').getContext('2d');
+    let pollutionChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'CO2 Emissions (ppm)',
+          data: [415, 418, 414, 419, 422, 420],
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#10b981',
+          pointRadius: 4
+        }, {
+          label: 'PM2.5 Levels (μg/m³)',
+          data: [35, 42, 28, 39, 45, 32],
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#3b82f6',
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() } } },
+        scales: {
+          y: { grid: { color: 'rgba(128,128,128,0.2)' }, ticks: { color: '#64748b' } },
+          x: { grid: { display: false }, ticks: { color: '#64748b' } }
+        },
+        interaction: { intersect: false, mode: 'index' }
+      }
+    });
+
+    function updateChartTheme() {
+      const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
+      pollutionChart.options.plugins.legend.labels.color = textColor;
+      pollutionChart.options.scales.x.ticks.color = textColor;
+      pollutionChart.options.scales.y.ticks.color = textColor;
+      pollutionChart.update();
+    }
+
+    // Scroll Animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
